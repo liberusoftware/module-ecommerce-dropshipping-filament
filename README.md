@@ -1,84 +1,104 @@
-# Ecommerce: Dropshipping Filament
+# ecommerce-dropshipping-filament
 
-> This optional Filament 5 presentation package presents exactly one independent domain module. It contributes reusable resources, pages, widgets, schemas, tables, infolists, and actions to application-owned panels while delegating authorization, validation, tenancy, persistence, and business rules to the ecommerce-dropshipping public boundary. It
+[![Tests](https://github.com/liberusoftware/module-ecommerce-dropshipping-filament/actions/workflows/tests.yml/badge.svg)](https://github.com/liberusoftware/module-ecommerce-dropshipping-filament/actions/workflows/tests.yml)
 
-[Software](https://liberusoftware.com) ·
-[Hosting](https://liberuhosting.com) ·
-[Services](https://liberuservices.com) ·
-[Liberu Group](https://liberugroup.com)
+The sourcing desk: a Filament 5 panel over
+[`liberusoftware/ecommerce-dropshipping`](https://github.com/liberusoftware/module-ecommerce-dropshipping).
 
-![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white) ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white) ![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)
-[![Latest release](https://img.shields.io/github/v/release/liberusoftware/module-ecommerce-dropshipping-filament?sort=semver)](https://github.com/liberusoftware/module-ecommerce-dropshipping-filament/releases/latest) [![Tests](https://github.com/liberusoftware/module-ecommerce-dropshipping-filament/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/liberusoftware/module-ecommerce-dropshipping-filament/actions/workflows/tests.yml)
+The suppliers a merchant sources from, what each of them supplies at what cost
+and in how many days, every purchase transmitted to them replayed from its own
+events, both costs and the difference between them, the promise made about timing
+and whether it was met, and the purchases nobody can currently account for.
 
-## Features
+## What it is not
 
-- Fully compatible with **Laravel 13**, **PHP 8.5**, and **Pest 5**.
-- Built following the domain-driven design guidelines of the Liberu architecture.
-- Reusable, presenting a clean public contract and boundaries.
-- Adheres to the strict database, security, and authorization standards of Liberu.
+**No screen here assigns a supplier to an order.** Routing is a decision over
+published supply offers — lead time first, then cost within a currency, then
+supplier code — and it is never an input. The host's checkout read
+`$request->has('dropship')` and `$request->input('supplier_id', 'dropxl')`: a
+hidden form field decided an order was drop-shipped and another named the
+supplier who would be paid. It had no choice, because there was no supplier
+table, no supplier model and no product-to-supplier link anywhere in the tree.
+The suppliers screen is where the data that decision is now made from lives.
 
-## Requirements
+**Nothing here sends a purchase, and nothing here sends one twice.** There is no
+transmit, re-transmit or retry action in this package, in any state. Sending
+takes the recipient's address, which this module deliberately does not hold; and
+re-sending is the fault — the host's queue guarded a retry on a reference the
+*supplier* minted, so a timeout after the supplier accepted shipped real goods
+twice at the merchant's cost. A purchase that was sent and never confirmed is
+offered **Reconcile**, which asks the supplier what they have.
 
-- **PHP 8.5**
-- **Composer 2**
-- A supported database (e.g. MySQL, PostgreSQL, SQLite)
+**Nothing absent is rendered as a number.** A promise nobody made and a promise a
+supplier missed are different facts and read differently. A cost variance across
+two currencies is absent rather than converted. An on-time share with nothing
+measurable to divide is an em dash, never `0%` — the domain publishes counts
+precisely so somebody has to decide what a denominator of zero means, and this
+panel decides out loud. Outstanding value is one figure per currency and is never
+summed.
 
-## Quick start
+**No destination, no address, no name, no email.** This module stores one opaque
+reference and none of the rest; this panel does not even show the reference.
 
-To install this package via Composer, run:
+## Screens
+
+| Screen | What it is for |
+| --- | --- |
+| **Suppliers** | The table the host did not have: the code that is the natural key, the currency, the timezone a promise is counted in, the lead time, and how many products each publishes an offer for |
+| **Supplier** | Its performance as counts with one division taken out loud, what it is owed per currency, what it supplies, and every purchase sent to it. Registers suppliers and publishes offers |
+| **Purchases** | Reference, supplier, order, the state folded from the events, both dates and the verdict. Outstanding value on the face of it |
+| **Purchase** | Both costs and the difference, the promise and its outcome, ordered against despatched per line, the problems raised, and the append-only journal. Reconciles and cancels |
+| **Needs reconciliation** | Every purchase sent and never confirmed, and every open purchase carrying a problem. No repair button and no figure |
+
+## Installing
+
+The domain package is not on Packagist, so the host adds the repository entry
+itself:
+
+```json
+"repositories": [
+  { "type": "vcs", "url": "https://github.com/liberusoftware/module-ecommerce-dropshipping" },
+  { "type": "vcs", "url": "https://github.com/liberusoftware/module-ecommerce-dropshipping-filament" }
+]
+```
 
 ```bash
-composer require liberusoftware/module-ecommerce-dropshipping-filament
+composer require liberusoftware/ecommerce-dropshipping-filament
 ```
+
+Installing boots nothing. The host enables both modules and attaches the plugin
+to the panels it means to:
+
+```dotenv
+MODULES_ENABLED=ecommerce-dropshipping,ecommerce-dropshipping-filament
+```
+
+```php
+use Filament\Facades\Filament;
+use Liberu\Ecommerce\Dropshipping\Filament\DropshippingPlugin;
+
+$panel->plugin(
+    DropshippingPlugin::make()
+        ->tenantUsing(fn (): string => (string) Filament::getTenant()?->getKey()),
+);
+```
+
+[`docs/adoption.md`](docs/adoption.md) covers what the host still has to do —
+routing, transmission and erasure are all its, and none of them is here.
 
 ## Documentation
 
-- [Liberu Main Documentation](https://github.com/liberusoftware/documentation)
-- [Architecture & Standards Index](https://github.com/liberusoftware/documentation/tree/main/architecture)
+| | |
+| --- | --- |
+| [`docs/panel.md`](docs/panel.md) | Every screen, what it renders and why it renders it that way |
+| [`docs/adoption.md`](docs/adoption.md) | What a host does, what it binds, and what it must not expect this package to do |
+| [`docs/runbook.md`](docs/runbook.md) | What breaks, what the symptom looks like, what to do about it |
 
-## Related Liberu Projects
+## Requirements
 
-| Project | Repository | Purpose |
-| --- | --- | --- |
-| **Boilerplate** | [liberusoftware/boilerplate-laravel](https://github.com/liberusoftware/boilerplate-laravel) | Shared Laravel application foundation and reference composition |
-| **CMS** | [liberu-cms/cms-laravel](https://github.com/liberu-cms/cms-laravel) | Structured content, publishing, media, multisite, and headless delivery |
-| **CRM** | [liberu-crm/crm-laravel](https://github.com/liberu-crm/crm-laravel) | Customer data, sales, marketing, service, and customer success |
-| **Billing** | [liberu-billing/billing-laravel](https://github.com/liberu-billing/billing-laravel) | Products, subscriptions, invoicing, payments, and provisioning |
-| **Accounting** | [liberu-accounting/accounting-laravel](https://github.com/liberu-accounting/accounting-laravel) | Ledgers, banking, tax, expenses, close, and financial reporting |
-| **Ecommerce** | [liberu-ecommerce/ecommerce-laravel](https://github.com/liberu-ecommerce/ecommerce-laravel) | Catalog, checkout, orders, fulfillment, returns, B2B, and omnichannel commerce |
-| **Control Panel** | [liberu-control-panel/control-panel-laravel](https://github.com/liberu-control-panel/control-panel-laravel) | Hosting, infrastructure, DNS, mail, databases, backups, and security operations |
-| **Automation** | [liberu-automation/automation-laravel](https://github.com/liberu-automation/automation-laravel) | Governed workflows, provider-neutral AI, approvals, and connectors |
-
-## Security
-
-Please do not report security vulnerabilities through public GitHub issues.
-Follow our [Security Policy](https://github.com/liberusoftware/documentation/blob/main/architecture/SECURITY.md) for private reporting and supported versions.
+PHP 8.5, Laravel 13, Filament 5.4 or later, and
+`liberusoftware/ecommerce-dropshipping` `^0.1`.
 
 ## License
 
-This project is open-source software. You may use, modify, and distribute it
-under the terms described in [LICENSE.md](LICENSE.md).
-
-The linked license text is authoritative; this summary is not legal advice.
-
-## Feedback and contributing
-
-Feedback and contributions are welcome. You can help by reporting reproducible
-bugs, proposing focused enhancements, improving documentation or translations,
-and submitting tested code changes.
-
-Before contributing, please read [CONTRIBUTING.md](https://github.com/liberusoftware/documentation/blob/main/standards/CONTRIBUTING.md) and our
-[Code of Conduct](https://github.com/liberusoftware/documentation/blob/main/architecture/CODE_OF_CONDUCT.md). Search existing issues first, then use
-the appropriate issue template. Pull requests should explain the problem and
-approach, remain focused, include or update tests, pass the required workflows,
-and document user-visible or breaking changes.
-
-## Contributors
-
-Thank you to everyone who helps improve Liberu.
-
-<a href="https://github.com/liberusoftware/module-ecommerce-dropshipping-filament/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=liberusoftware/module-ecommerce-dropshipping-filament" alt="Contributors to liberusoftware/module-ecommerce-dropshipping-filament">
-</a>
-
-[View the full contributors graph](https://github.com/liberusoftware/module-ecommerce-dropshipping-filament/graphs/contributors).
+MIT. See [LICENSE.md](LICENSE.md).
