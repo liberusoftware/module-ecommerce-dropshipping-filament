@@ -1,0 +1,35 @@
+{
+    "name": "ecommerce-dropshipping-filament",
+    "version": "0.1.0",
+    "description": "The sourcing desk: the suppliers a merchant sources from, what each supplies at what cost and lead time, every purchase transmitted to them replayed from its events, and the purchases nobody can currently account for.",
+    "category": "presentation",
+    "provider": "Liberu\\Ecommerce\\Dropshipping\\Filament\\DropshippingFilamentServiceProvider",
+    "requires": {
+        "packages": {
+            "liberusoftware/ecommerce-dropshipping": "^0.1"
+        }
+    },
+    "presentation": {
+        "filament": {
+            "admin": [
+                "Liberu\\Ecommerce\\Dropshipping\\Filament\\DropshippingPlugin"
+            ]
+        }
+    },
+    "features": [
+        "No screen anywhere assigns a supplier to an order: routing is a decision over published offers and never an input",
+        "No screen anywhere transmits or re-transmits a purchase, because re-sending after a timeout is how the same goods ship twice",
+        "A purchase that was sent and not confirmed offers reconcile, which asks the supplier what they have",
+        "Reconciling reports four outcomes, and the two that mean nobody was asked and nobody can be asked are told apart",
+        "A purchase state is a fold over its append-only events, so no list column is sortable on one and no callback overwrites one",
+        "A promise that was never made and a promise that was missed are rendered differently, and neither is rendered as a percentage",
+        "A cost variance across two currencies is rendered absent rather than converted, and separately from a supplier who has not stated a cost",
+        "Outstanding value is one figure per currency and is never summed across them",
+        "A supplier's on-time share is divided here, over measurable despatches only, and a denominator of zero is an em dash rather than nought per cent",
+        "No destination, address, name or email is shown on any screen, because the module stores none",
+        "Registering a supplier and publishing an offer go through the domain actions, so the natural keys and the currency check apply",
+        "No API key is entered, stored or displayed: a supplier names a credential the host's secret store holds",
+        "Every screen states its merchant, and a reference belonging to another merchant is not found",
+        "Every unpublished Filament ability is forced closed by name, per resource and per relation manager"
+    ]
+}

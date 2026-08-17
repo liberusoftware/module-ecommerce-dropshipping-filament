@@ -1,0 +1,51 @@
+{
+    "name": "liberusoftware/ecommerce-dropshipping-filament",
+    "description": "The sourcing desk: a Filament panel over suppliers, what they supply at what cost and lead time, and the append-only life of every purchase transmitted to them.",
+    "type": "liberu-module",
+    "license": "MIT",
+    "version": "0.1.0",
+    "keywords": ["laravel", "filament", "ecommerce", "dropshipping", "supplier", "sourcing", "liberu"],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/liberusoftware/module-ecommerce-dropshipping"
+        }
+    ],
+    "require": {
+        "php": "^8.5",
+        "filament/filament": "^5.4",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/support": "^13.0",
+        "liberusoftware/ecommerce-dropshipping": "^0.1",
+        "nesbot/carbon": "^3.8.4"
+    },
+    "require-dev": {
+        "liberusoftware/package-testbench": "^1.7",
+        "livewire/livewire": "^4.2",
+        "pestphp/pest": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Liberu\\Ecommerce\\Dropshipping\\Filament\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Liberu\\Ecommerce\\Dropshipping\\Filament\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "liberu": {
+            "name": "ecommerce-dropshipping-filament"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

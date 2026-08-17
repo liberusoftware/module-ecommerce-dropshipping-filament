@@ -1,0 +1,19 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    # The shared workflow files are `package-`-prefixed; this caller is not.
+    # The README badge points at actions/workflows/tests.yml, so renaming this
+    # file to match the shared one leaves the badge pointing at nothing.
+    uses: liberusoftware/.github/.github/workflows/package-tests.yml@main
+    with:
+      phpstan-level: 8
+      coverage-threshold: 95
